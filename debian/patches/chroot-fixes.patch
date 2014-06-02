@@ -1,0 +1,147 @@
+Fix up some chroot-related paths. And your mum.
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -207,6 +207,14 @@
+ install: all
+ 	$(INSTALL) -m 0700 -d $(IRCDDIR)
+ 	$(INSTALL) -m 0700 src/ircd $(BINDIR) 2>/dev/null || { $(INSTALL) -m 0700 -d "$$(dirname '$(BINDIR)')"; $(INSTALL) -m 0700 src/ircd $(BINDIR); }
++	$(TOUCH) $(IRCDDIR)/ircd.rules
++	$(INSTALL) -m 0700 -d $(IRCDDIR)/motd
++	$(TOUCH) $(IRCDDIR)/motd/ircd.motd
++	$(TOUCH) $(IRCDDIR)/motd/ircd.smotd
++	$(TOUCH) $(IRCDDIR)/motd/ircd.svsmotd
++	$(TOUCH) $(IRCDDIR)/motd/oper.motd
++	$(TOUCH) $(IRCDDIR)/motd/bot.motd
++	$(INSTALL) -m 0700 -d $(IRCDDIR)/run
+ 	$(INSTALL) -m 0700 -d $(IRCDDIR)/doc
+ 	$(INSTALL) -m 0600 doc/Authors doc/example.conf doc/coding-guidelines doc/tao.of.irc doc/unreal32docs.html $(IRCDDIR)/doc
+ 	$(INSTALL) -m 0700 -d $(IRCDDIR)/aliases
+@@ -218,9 +226,6 @@
+ 	$(INSTALL) -m 0700 unreal $(IRCDDIR)
+ 	$(INSTALL) -m 0700 -d $(IRCDDIR)/modules
+ 	$(INSTALL) -m 0700 src/modules/*.so $(IRCDDIR)/modules
+-	$(INSTALL) -m 0700 -d $(IRCDDIR)/ircdcron
+-	$(INSTALL) -m 0600 ircdcron/ircd.cron $(IRCDDIR)/ircdcron
+-	$(INSTALL) -m 0700 ircdcron/ircdchk $(IRCDDIR)/ircdcron
+ 	-@if [ ! -f "$(IRCDDIR)/curl-ca-bundle.crt" ] ; then \
+ 		$(INSTALL) -m 0700 curl-ca-bundle.crt $(IRCDDIR) ; \
+ 	fi
+--- a/include/config.h
++++ b/include/config.h
+@@ -95,7 +95,7 @@
+  * If channel mode is +z, only send to secure links & people
+  *
+ */
+-#undef SECURECHANMSGSONLYGOTOSECURE
++#define SECURECHANMSGSONLYGOTOSECURE
+ 
+ /*
+    If you want to support chinese and/or japanese nicks
+@@ -107,7 +107,7 @@
+ /*
+   Remote rehash
+ */
+-#define REMOTE_REHASH
++#undef REMOTE_REHASH
+ 
+ /*
+  * Special remote include caching, see this Changelog item:
+@@ -150,13 +150,13 @@
+  *
+  * This enables the spoof protection.
+  */
+-/* #define NOSPOOF 1  */
++#define NOSPOOF 1
+ 
+ 
+ /*
+  * Enables locops to override the RFC1459 flood control too
+ */
+-#undef NO_FAKE_LAG_FOR_LOCOPS
++#define NO_FAKE_LAG_FOR_LOCOPS
+ 
+ /*
+  * HOSTILENAME - Define this if you want the hostile username patch included,
+@@ -243,15 +243,15 @@
+  * unrealircd.conf.
+  */
+ #define	CPATH		"unrealircd.conf"	/* server configuration file */
+-#define	MPATH		"ircd.motd"	/* server MOTD file */
+-#define SMPATH          "ircd.smotd"    /* short MOTD file */
+-#define RPATH   	"ircd.rules"	/* server rules file */
+-#define OPATH   	"oper.motd"	/* Operators MOTD file */
+-#define	LPATH		"debug.log"	/* Where the debug file lives, if DEBUGMODE */
+-#define	PPATH		"ircd.pid"	/* file for server pid */
+-#define VPATH		"ircd.svsmotd"	/* Services MOTD append. */
+-#define BPATH		"bot.motd"	/* Bot MOTD */
+-#define IRCDTUNE 	"ircd.tune"	/* tuning .. */
++#define	MPATH		"motd/ircd.motd"	/* server MOTD file */
++#define	SMPATH		"motd/ircd.smotd"    /* short MOTD file */
++#define	RPATH		"ircd.rules"	/* server rules file */
++#define	OPATH		"motd/oper.motd"	/* Operators MOTD file */
++#define	LPATH		"run/debug.log"	/* Where the debug file lives, if DEBUGMODE */
++#define	PPATH		"run/ircd.pid"	/* file for server pid */
++#define	VPATH		"motd/ircd.svsmotd"	/* Services MOTD append. */
++#define	BPATH		"motd/bot.motd"	/* Bot MOTD */
++#define	IRCDTUNE	"run/ircd.tune"	/* tuning .. */
+ 
+ /* CHROOTDIR
+  *
+@@ -268,7 +268,7 @@
+  *
+  * Change to '#define CHROOTDIR' to enable...
+  */
+-/* #define CHROOTDIR    */
++#define CHROOTDIR
+ 
+ /*
+  * IRC_USER
+@@ -277,8 +277,8 @@
+  * define IRC_USER to that user name.  This should only be defined if you 
+  * are running as root and even then perhaps not.
+  */
+-/* #define IRC_USER  "<user name>" */
+-/* #define IRC_GROUP "<group name>" */
++#define IRC_USER  "ircd"
++#define IRC_GROUP "ircd"
+ 
+ 
+ /* SHOW_INVISIBLE_LUSERS
+@@ -314,7 +314,7 @@
+  * Common usage for this are: a trusted bot ran by an IRCOp, that you only
+  * want to give "flood access" and nothing else, and other such things.
+  */
+-#undef FAKELAG_CONFIGURABLE
++#define FAKELAG_CONFIGURABLE
+ 
+ /*
+  * Size of the LISTEN request.  Some machines handle this large
+--- a/src/s_serv.c
++++ b/src/s_serv.c
+@@ -149,25 +149,8 @@
+ char *getosname(void)
+ {
+ static char buf[1024];
+-struct utsname osinf;
+-char *p;
+ 
+-	memset(&osinf, 0, sizeof(osinf));
+-	if (uname(&osinf) != 0)
+-		return "<unknown>";
+-	snprintf(buf, sizeof(buf), "%s %s %s %s %s",
+-		osinf.sysname,
+-		osinf.nodename,
+-		osinf.release,
+-		osinf.version,
+-		osinf.machine);
+-	/* get rid of cr/lf */
+-	for (p=buf; *p; p++)
+-		if ((*p == '\n') || (*p == '\r'))
+-		{
+-			*p = '\0';
+-			break;
+-		}
++	snprintf(buf, sizeof(buf), "Your mum says hi.");
+ 	return buf;
+ }
+ #endif
