@@ -10,10 +10,28 @@
 #export DH_VERBOSE=1
 
 override_dh_auto_configure:
-	./configure --with-showlistmodes --with-listen=5 --with-dpath=/etc/unrealircd --with-spath=/usr/bin/ircd --with-nick-history=2000 --with-sendq=3000000 --with-bufferpool=18 --with-permissions=0600 --with-fd-setsize=1024 --enable-dynamic-linking
+	./configure \
+      --with-showlistmodes \
+      --with-listen=5 \
+      --with-dpath=/var/chroot/unreal \
+      --with-spath=/var/chroot/unreal/bin/ircd \
+      --with-nick-history=1024 \
+      --with-sendq=2097152 \
+      --with-bufferpool=16 \
+      --with-permissions=0640 \
+      --with-fd-setsize=1024 \
+      --enable-dynamic-linking \
+      --enable-ssl \
+      --enable-inet6 \
+      --with-showlistmodes \
+      --with-topic0snuhost \
+      --with-operoverride-verify
 
 override_dh_auto_install:
-	make IRCDDIR=debian/unrealircd/etc/unrealircd BINDIR=debian/unrealircd/usr/bin/ircd install
+	make \
+      IRCDDIR=debian/unrealircd/var/chroot/unreal \
+      BINDIR=debian/unrealircd/var/chroot/unreal/bin/ircd \
+      install
 
 %:
 	dh $@  --with autotools-dev

@@ -9,7 +9,7 @@ Homepage: <insert the upstream URL, if relevant>
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/unrealircd.git;a=summary
 
 Package: unrealircd
-Architecture: any
+Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: Unreal IRCd
+ Unreal IRC server, customized for pl0rt.org.
