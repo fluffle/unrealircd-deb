@@ -1,7 +1,7 @@
 Fix up some chroot-related paths. And your mum.
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -207,6 +207,14 @@
+@@ -207,6 +207,15 @@
  install: all
  	$(INSTALL) -m 0700 -d $(IRCDDIR)
  	$(INSTALL) -m 0700 src/ircd $(BINDIR) 2>/dev/null || { $(INSTALL) -m 0700 -d "$$(dirname '$(BINDIR)')"; $(INSTALL) -m 0700 src/ircd $(BINDIR); }
