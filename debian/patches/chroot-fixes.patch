@@ -1,7 +1,7 @@
 Fix up some chroot-related paths. And your mum.
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -207,6 +207,15 @@
+@@ -207,6 +207,16 @@
  install: all
  	$(INSTALL) -m 0700 -d $(IRCDDIR)
  	$(INSTALL) -m 0700 src/ircd $(BINDIR) 2>/dev/null || { $(INSTALL) -m 0700 -d "$$(dirname '$(BINDIR)')"; $(INSTALL) -m 0700 src/ircd $(BINDIR); }
@@ -14,6 +14,7 @@ Fix up some chroot-related paths. And your mum.
 +	$(TOUCH) $(IRCDDIR)/motd/bot.motd
 +	$(INSTALL) -m 0700 -d $(IRCDDIR)/run
 +	$(INSTALL) -m 0700 -d $(IRCDDIR)/tmp
++	$(INSTALL) -m 0700 -d $(IRCDDIR)/ssl
  	$(INSTALL) -m 0700 -d $(IRCDDIR)/doc
  	$(INSTALL) -m 0600 doc/Authors doc/example.conf doc/coding-guidelines doc/tao.of.irc doc/unreal32docs.html $(IRCDDIR)/doc
  	$(INSTALL) -m 0700 -d $(IRCDDIR)/aliases
