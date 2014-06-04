@@ -46,7 +46,7 @@ do_start()
 		echo "UnrealIRCd is already running"
 		return 0
 	fi
-    rm $PIDFILE
+    rm -f $PIDFILE
 	$DAEMON
 	sleep 1
 	if [ ! -r $PIDFILE ] ; then

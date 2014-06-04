@@ -4,5 +4,6 @@
 # see: dh_installdeb(1)
 
 chown -R irc:irc /var/chroot/unreal
+update-rc.d unrealircd defaults
 
 exit 0
