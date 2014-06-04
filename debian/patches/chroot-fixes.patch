@@ -102,8 +102,8 @@ Fix up some chroot-related paths. And your mum.
   */
 -/* #define IRC_USER  "<user name>" */
 -/* #define IRC_GROUP "<group name>" */
-+#define IRC_USER  "ircd"
-+#define IRC_GROUP "ircd"
++#define IRC_USER  "irc"
++#define IRC_GROUP "irc"
  
  
  /* SHOW_INVISIBLE_LUSERS

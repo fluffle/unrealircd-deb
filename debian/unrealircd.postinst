@@ -3,6 +3,6 @@
 #
 # see: dh_installdeb(1)
 
-chown -R ircd:ircd /var/chroot/unreal
+chown -R irc:irc /var/chroot/unreal
 
 exit 0
