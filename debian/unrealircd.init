@@ -18,10 +18,10 @@
 
 PATH=/bin:/usr/bin
 NAME=unrealircd             # Introduce the short server's name here
-DAEMON=/var/chroot/unreal/bin/ircd # Introduce the server's location here
-PIDFILE=/var/chroot/unreal/run/ircd.pid
+CHROOTDIR=/var/chroot/unreal
+DAEMON=$CHROOTDIR/bin/ircd # Introduce the server's location here
+PIDFILE=$CHROOTDIR/run/ircd.pid
 SCRIPTNAME=/etc/init.d/$NAME
-SU=/bin/su
 
 # Exit if the package is not installed
 [ -x $DAEMON ] || exit 0
@@ -36,12 +36,17 @@ SU=/bin/su
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
+is_running() {
+  pgrep -x -u irc ircd >/dev/null
+}
+
 do_start()
 {
-	if [ -r $PIDFILE ] ; then
+	if is_running; then
 		echo "UnrealIRCd is already running"
 		return 0
 	fi
+    rm $PIDFILE
 	$DAEMON
 	sleep 1
 	if [ ! -r $PIDFILE ] ; then
@@ -60,33 +65,33 @@ do_start()
 
 do_stop()
 {
-	if [ ! -r $PIDFILE ] ; then
+	if ! is_running; then
 		echo "UnrealIRCd was already stopped"
 		return 0
 	fi
-	kill $(cat $PIDFILE)
+	pkill -x -u irc ircd
 	RETVAL="$?"
 	[ "$RETVAL" = 0 ] && rm -f $PIDFILE
 	return "$RETVAL"
 }
 
 do_reload() {
-	echo "Reloading UnrealIRCd"
-	if [ ! -r $PIDFILE ] ; then
+	if ! is_running; then
 		echo "ERROR: UnrealIRCd is not running"
 		return 1
 	fi
-	kill -1 $(cat $PIDFILE)
+	echo "Reloading UnrealIRCd"
+	pkill -1 -x -u irc ircd
 	return 0
 }
 
 do_restart() {
-	echo "Restarting UnrealIRCd"
-	if [ ! -r $PIDFILE ] ; then
+	if ! is_running; then
 		echo "ERROR: UnrealIRCd is not running"
 		return 1
 	fi
-	kill -2 $(cat $PIDFILE)
+	echo "Restarting UnrealIRCd"
+	pkill -2 -x -u irc ircd
 	return 0
 }
 

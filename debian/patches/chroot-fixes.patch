@@ -13,6 +13,7 @@ Fix up some chroot-related paths. And your mum.
 +	$(TOUCH) $(IRCDDIR)/motd/oper.motd
 +	$(TOUCH) $(IRCDDIR)/motd/bot.motd
 +	$(INSTALL) -m 0700 -d $(IRCDDIR)/run
++	$(INSTALL) -m 0700 -d $(IRCDDIR)/tmp
  	$(INSTALL) -m 0700 -d $(IRCDDIR)/doc
  	$(INSTALL) -m 0600 doc/Authors doc/example.conf doc/coding-guidelines doc/tao.of.irc doc/unreal32docs.html $(IRCDDIR)/doc
  	$(INSTALL) -m 0700 -d $(IRCDDIR)/aliases
