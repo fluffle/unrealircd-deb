@@ -3,9 +3,6 @@
 #
 # see: dh_installdeb(1)
 
-chgrp irc /usr/bin/ircd
-chmod 750 /usr/bin/ircd
-
-chown -R irc:irc /etc/unrealircd
+chown -R ircd:ircd /var/chroot/unreal
 
 exit 0

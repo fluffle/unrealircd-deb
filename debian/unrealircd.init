@@ -18,8 +18,8 @@
 
 PATH=/bin:/usr/bin
 NAME=unrealircd             # Introduce the short server's name here
-DAEMON=/usr/bin/ircd # Introduce the server's location here
-PIDFILE=/run/ircd.pid
+DAEMON=/var/chroot/unreal/bin/ircd # Introduce the server's location here
+PIDFILE=/var/chroot/unreal/run/ircd.pid
 SCRIPTNAME=/etc/init.d/$NAME
 SU=/bin/su
 
@@ -42,19 +42,18 @@ do_start()
 		echo "UnrealIRCd is already running"
 		return 0
 	fi
-	$SU -c $DAEMON irc
+	$DAEMON
 	sleep 1
-	if [ ! -r /etc/unrealircd/ircd.pid ] ; then
+	if [ ! -r $PIDFILE ] ; then
 		echo "Possible error encountered (IRCd seemingly not started)"	
 		echo "====================================================="
 		echo "Check above for possible errors, and this output of  "
 		echo "ircd.log. If you cannot solve the problem, read"
 		echo "Unreal.nfo on where to get support"
 		echo "====================================================="
-		tail -n 5 /etc/unrealircd/ircd.log
+		tail -n 5 /var/chroot/unreal/run/ircd.log
 		return 2
 	fi
-	mv /etc/unrealircd/ircd.pid $PIDFILE
 	echo "Starting UnrealIRCd"
 	return 0
 }
@@ -65,7 +64,7 @@ do_stop()
 		echo "UnrealIRCd was already stopped"
 		return 0
 	fi
-	kill -9 `cat $PIDFILE`
+	kill $(cat $PIDFILE)
 	RETVAL="$?"
 	[ "$RETVAL" = 0 ] && rm -f $PIDFILE
 	return "$RETVAL"
@@ -77,7 +76,7 @@ do_reload() {
 		echo "ERROR: UnrealIRCd is not running"
 		return 1
 	fi
-	kill -1 `cat $PIDFILE`
+	kill -1 $(cat $PIDFILE)
 	return 0
 }
 
@@ -87,7 +86,7 @@ do_restart() {
 		echo "ERROR: UnrealIRCd is not running"
 		return 1
 	fi
-	kill -2 `cat $PIDFILE`
+	kill -2 $(cat $PIDFILE)
 	return 0
 }
 
